@@ -16,11 +16,11 @@ load_dotenv()
 
 # Gemini API 키 설정
 gemini_api_key = os.getenv('GEMINI_API_KEY')
-if not gemini_api_key or gemini_api_key == 'your_gemini_api_key_here':
+if not gemini_api_key:
     logger.warning("Gemini API 키가 설정되지 않았습니다. .env 파일에 올바른 API 키를 설정해주세요.")
 
 # Gemini 클라이언트 설정
-if gemini_api_key and gemini_api_key != 'your_gemini_api_key_here':
+if gemini_api_key:
     genai.configure(api_key=gemini_api_key)
     gemini_model = genai.GenerativeModel('gemini-1.5-flash')
 else:
@@ -35,7 +35,7 @@ def home(request):
 def chat_api(request):
     """챗봇 API 엔드포인트"""
     try:
-        if not gemini_api_key or gemini_api_key == 'your_gemini_api_key_here':
+        if not gemini_api_key:
             return JsonResponse({
                 'error': 'Gemini API 키가 설정되지 않았습니다. .env 파일에 올바른 API 키를 설정해주세요.',
                 'status': 'error'
@@ -73,18 +73,6 @@ def chat_api(request):
         logger.error(f"Gemini API 오류: {str(e)}")
         return JsonResponse({
             'error': f'Gemini API 오류가 발생했습니다: {str(e)}',
-            'status': 'error'
-        }, status=500)
-    except json.JSONDecodeError:
-        logger.error("JSON 파싱 오류")
-        return JsonResponse({
-            'error': '잘못된 요청 형식입니다.',
-            'status': 'error'
-        }, status=400)
-    except Exception as e:
-        logger.error(f"예상치 못한 오류: {str(e)}")
-        return JsonResponse({
-            'error': f'서버 오류가 발생했습니다: {str(e)}',
             'status': 'error'
         }, status=500)
 
